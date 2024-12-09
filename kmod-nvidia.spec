@@ -1,6 +1,6 @@
-%global	kmod_name nvidia
+%global kmod_name nvidia
 
-%global	debug_package %{nil}
+%global debug_package %{nil}
 
 # Generate kernel symbols requirements:
 %global _use_internal_dependency_generator 0
@@ -18,8 +18,8 @@
 
 %{!?kversion: %global kversion %(uname -r)}
 
-Name:           %{kmod_name}-kmod
-Version:        565.57.01
+Name:           kmod-%{kmod_name}
+Version:        565.77
 Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
@@ -34,25 +34,18 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
 BuildRequires:  kernel-abi-stablelists
 BuildRequires:  kernel-devel
+BuildRequires:  kernel-rpm-macros
 BuildRequires:  kmod
 BuildRequires:  redhat-rpm-config
-BuildRequires:  kernel-rpm-macros
-
-%description
-This package provides the proprietary NVIDIA OpenGL kernel driver module.
-It is built to depend upon the specific ABI provided by a range of releases of
-the same variant of the Linux kernel and not on any one specific build.
-
-%package -n kmod-%{kmod_name}
-Summary:    %{kmod_name} kernel module(s)
 
 Provides:   kabi-modules = %{kversion}
 Provides:   %{kmod_name}-kmod = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:   module-init-tools
 
-%description -n kmod-%{kmod_name}
-This package provides the %{kmod_name} kernel module(s) built for the Linux kernel
-using the %{_target_cpu} family of processors.
+%description
+This package provides the proprietary NVIDIA kernel modules. It is built to
+depend upon the specific ABI provided by a range of releases of the same variant
+of the Linux kernel and not on any one specific build.
 
 %prep
 %ifarch x86_64
@@ -73,10 +66,10 @@ export IGNORE_XEN_PRESENCE=1
 export IGNORE_PREEMPT_RT_PRESENCE=1
 export IGNORE_CC_MISMATCH=1
 
-%make_build module
+%make_build modules
 
 %install
-export INSTALL_MOD_PATH=%{buildroot}
+export INSTALL_MOD_PATH=%{buildroot}%{_prefix}
 export INSTALL_MOD_DIR=extra/%{kmod_name}
 
 make -C %{_usrsrc}/kernels/%{kversion} modules_install M=$PWD
@@ -84,35 +77,41 @@ make -C %{_usrsrc}/kernels/%{kversion} modules_install M=$PWD
 install -d %{buildroot}%{_sysconfdir}/depmod.d/
 install kmod-%{kmod_name}.conf %{buildroot}%{_sysconfdir}/depmod.d/
 # Remove the unrequired files.
-rm -f %{buildroot}/lib/modules/%{kversion}/modules.*
+rm -f %{buildroot}%{_prefix}/lib/modules/%{kversion}/modules.*
 
-%post -n kmod-%{kmod_name}
+%post
 if [ -e "/boot/System.map-%{kversion}" ]; then
-    /usr/sbin/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
+    %{_sbindir}/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
 fi
-modules=( $(find /lib/modules/%{kversion}/extra/%{kmod_name} | grep '\.ko$') )
-if [ -x "/usr/sbin/weak-modules" ]; then
-    printf '%s\n' "${modules[@]}" | /usr/sbin/weak-modules --add-modules
+modules=( $(find %{_prefix}/lib/modules/%{kversion}/extra/%{kmod_name} | grep '\.ko$') )
+if [ -x "%{_sbindir}/weak-modules" ]; then
+    printf '%s\n' "${modules[@]}" | %{_sbindir}/weak-modules --add-modules
 fi
 
-%preun -n kmod-%{kmod_name}
-rpm -ql kmod-%{kmod_name}-%{version}-%{release}.%{_target_cpu} | grep '\.ko$' > /var/run/rpm-kmod-%{kmod_name}-modules
+%preun
+rpm -ql kmod-%{kmod_name}-%{version}-%{release}.%{_target_cpu} | grep '\.ko$' > %{_var}/run/rpm-kmod-%{kmod_name}-modules
 
-%postun -n kmod-%{kmod_name}
+%postun
 if [ -e "/boot/System.map-%{kversion}" ]; then
-    /usr/sbin/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
+    %{_sbindir}/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
 fi
 modules=( $(cat /var/run/rpm-kmod-%{kmod_name}-modules) )
-rm /var/run/rpm-kmod-%{kmod_name}-modules
-if [ -x "/usr/sbin/weak-modules" ]; then
-    printf '%s\n' "${modules[@]}" | /usr/sbin/weak-modules --remove-modules
+rm %{_var}/run/rpm-kmod-%{kmod_name}-modules
+if [ -x "%{_sbindir}/weak-modules" ]; then
+    printf '%s\n' "${modules[@]}" | %{_sbindir}/weak-modules --remove-modules
 fi
 
-%files -n kmod-%{kmod_name}
-/lib/modules/%{kversion}/extra/*
-%config /etc/depmod.d/kmod-%{kmod_name}.conf
+%files
+%{_prefix}/lib/modules/%{kversion}/extra/*
+%config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Mon Dec 09 2024 Simone Caronni <negativo17@gmail.com> - 3:565.77-1
+- Update to 565.77.
+- Rename source package from nvidia-kmod to kmod-nvidia, the former is now used
+  for the akmods variant.
+- Use /usr/lib/modules for installing kernel modules and not /lib/modules.
+
 * Sat Oct 26 2024 Simone Caronni <negativo17@gmail.com> - 3:565.57.01-1
 - Update to 565.57.01.
 
