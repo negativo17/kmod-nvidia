@@ -27,11 +27,11 @@ License:        NVIDIA License
 URL:            http://www.nvidia.com/
 ExclusiveArch:  x86_64 aarch64
 
-Source0:        %{kmod_name}-kmod-%{version}-x86_64.tar.xz
-Source1:        %{kmod_name}-kmod-%{version}-aarch64.tar.xz
+Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{version}/open-gpu-kernel-modules-%{version}.tar.gz
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  kernel-abi-stablelists
 BuildRequires:  kernel-devel
 BuildRequires:  kernel-rpm-macros
@@ -48,15 +48,7 @@ depend upon the specific ABI provided by a range of releases of the same variant
 of the Linux kernel and not on any one specific build.
 
 %prep
-%ifarch x86_64
-%autosetup -n %{kmod_name}-kmod-%{version}-x86_64
-%endif
-
-%ifarch aarch64
-%autosetup -T -b 1 -n %{kmod_name}-kmod-%{version}-aarch64
-%endif
-
-mv kernel/* .
+%autosetup -p1 -n open-gpu-kernel-modules-%{version}
 
 echo "override %{kmod_name} * weak-updates/%{kmod_name}" > kmod-%{kmod_name}.conf
 
@@ -72,7 +64,7 @@ export IGNORE_CC_MISMATCH=1
 export INSTALL_MOD_PATH=%{buildroot}%{_prefix}
 export INSTALL_MOD_DIR=extra/%{kmod_name}
 
-make -C %{_usrsrc}/kernels/%{kversion} modules_install M=$PWD
+make -C %{_usrsrc}/kernels/%{kversion} modules_install M=$PWD/kernel-open
 
 install -d %{buildroot}%{_sysconfdir}/depmod.d/
 install kmod-%{kmod_name}.conf %{buildroot}%{_sysconfdir}/depmod.d/
@@ -108,6 +100,7 @@ fi
 %changelog
 * Mon Jan 27 2025 Simone Caronni <negativo17@gmail.com> - 3:570.86.15-1
 - Update to 570.86.15.
+- Switch to open modules, required for Blackwell.
 
 * Mon Dec 09 2024 Simone Caronni <negativo17@gmail.com> - 3:565.77-1
 - Update to 565.77.
