@@ -5,22 +5,11 @@
 # Generate kernel symbols requirements:
 %global _use_internal_dependency_generator 0
 
-%define __spec_install_post \
-  %{__arch_install_post}\
-  %{__os_install_post}\
-  %{__mod_compress_install_post}
-
-%define __mod_compress_install_post \
-  if [ $kernel_version ]; then \
-    find %{buildroot} -type f -name '*.ko' | xargs %{__strip} --strip-debug; \
-    find %{buildroot} -type f -name '*.ko' | xargs xz; \
-  fi
-
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
 Version:        570.124.04
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -71,17 +60,20 @@ install kmod-%{kmod_name}.conf %{buildroot}%{_sysconfdir}/depmod.d/
 # Remove the unrequired files.
 rm -f %{buildroot}%{_prefix}/lib/modules/%{kversion}/modules.*
 
+find %{buildroot} -type f -name '*.ko' | xargs %{__strip} --strip-debug
+find %{buildroot} -type f -name '*.ko' | xargs xz
+
 %post
 if [ -e "/boot/System.map-%{kversion}" ]; then
     %{_sbindir}/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
 fi
-modules=( $(find %{_prefix}/lib/modules/%{kversion}/extra/%{kmod_name} | grep '\.ko$') )
+modules=( $(find %{_prefix}/lib/modules/%{kversion}/extra/%{kmod_name} | grep '\.ko.xz$') )
 if [ -x "%{_sbindir}/weak-modules" ]; then
     printf '%s\n' "${modules[@]}" | %{_sbindir}/weak-modules --add-modules
 fi
 
 %preun
-rpm -ql kmod-%{kmod_name}-%{version}-%{release}.%{_target_cpu} | grep '\.ko$' > %{_var}/run/rpm-kmod-%{kmod_name}-modules
+rpm -ql kmod-%{kmod_name}-%{version}-%{release}.%{_target_cpu} | grep '\.ko.xz$' > %{_var}/run/rpm-kmod-%{kmod_name}-modules
 
 %postun
 if [ -e "/boot/System.map-%{kversion}" ]; then
@@ -98,6 +90,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Wed Mar 12 2025 Simone Caronni <negativo17@gmail.com> - 3:570.124.04-2
+- Drop compress macro and just add a step during install.
+
 * Fri Feb 28 2025 Simone Caronni <negativo17@gmail.com> - 3:570.124.04-1
 - Update to 570.124.04.
 
