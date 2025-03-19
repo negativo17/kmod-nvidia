@@ -8,8 +8,8 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        570.124.04
-Release:        2%{?dist}
+Version:        570.133.07
+Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -90,6 +90,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Wed Mar 19 2025 Simone Caronni <negativo17@gmail.com> - 3:570.133.07-1
+- Update to 570.133.07.
+
 * Wed Mar 12 2025 Simone Caronni <negativo17@gmail.com> - 3:570.124.04-2
 - Drop compress macro and just add a step during install.
 
