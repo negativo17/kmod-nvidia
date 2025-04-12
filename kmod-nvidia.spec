@@ -9,7 +9,7 @@
 
 Name:           kmod-%{kmod_name}
 Version:        570.133.07
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -17,6 +17,8 @@ URL:            http://www.nvidia.com/
 ExclusiveArch:  x86_64 aarch64
 
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{version}/open-gpu-kernel-modules-%{version}.tar.gz
+# Kbuild: Convert EXTRA_CFLAGS to ccflags-y (6.15+) + std=gnu17
+Patch0:         nvidia-kernel-ccflags-y.patch
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
@@ -90,6 +92,10 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Sat Apr 12 2025 Simone Caronni <negativo17@gmail.com> - 3:570.133.07-2
+- Convert EXTRA_CFLAGS to ccflags-y for kernel 6.15 and add -std=gnu17 to fix
+  compilation on Fedora 42's 6.14.1 kernel.
+
 * Wed Mar 19 2025 Simone Caronni <negativo17@gmail.com> - 3:570.133.07-1
 - Update to 570.133.07.
 
