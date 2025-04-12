@@ -20,7 +20,8 @@ Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{vers
 # Kbuild: Convert EXTRA_CFLAGS to ccflags-y (6.15+) + std=gnu17
 Patch0:         nvidia-kernel-ccflags-y.patch
 # https://git.almalinux.org/ngompa/nvidia-kmod-el-rpm/
-Patch1:         nvidia-ldflags.patch
+Patch1:         %{name}-ldflags.patch
+Patch2:         %{name}-no-hostname-whoami.patch
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
@@ -57,7 +58,7 @@ export IGNORE_CC_MISMATCH=1
 export INSTALL_MOD_PATH=%{buildroot}%{_prefix}
 export INSTALL_MOD_DIR=extra/%{kmod_name}
 
-make -C %{_usrsrc}/kernels/%{kversion} modules_install M=$PWD/kernel-open
+make -C %{_usrsrc}/kernels/%{kversion} -j$(nproc) modules_install M=$PWD/kernel-open
 
 install -d %{buildroot}%{_sysconfdir}/depmod.d/
 install kmod-%{kmod_name}.conf %{buildroot}%{_sysconfdir}/depmod.d/
@@ -97,6 +98,9 @@ fi
 * Sat Apr 12 2025 Simone Caronni <negativo17@gmail.com> - 3:570.133.07-2
 - Convert EXTRA_CFLAGS to ccflags-y for kernel 6.15 and add -std=gnu17 to fix
   compilation on Fedora 42's 6.14.1 kernel.
+- Fix compilation on el10.
+- Do not look for hostname and whoami binaries while building.
+- Enable parallel building.
 
 * Wed Mar 19 2025 Simone Caronni <negativo17@gmail.com> - 3:570.133.07-1
 - Update to 570.133.07.
