@@ -8,7 +8,7 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        570.153.02
+Version:        575.51.02
 Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
@@ -17,9 +17,11 @@ URL:            http://www.nvidia.com/
 ExclusiveArch:  x86_64 aarch64
 
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{version}/open-gpu-kernel-modules-%{version}.tar.gz
+# Kbuild: Convert EXTRA_CFLAGS to ccflags-y (6.15+) + std=gnu17
+Patch0:         nvidia-kernel-ccflags-y.patch
 # https://git.almalinux.org/ngompa/nvidia-kmod-el-rpm/
-Patch0:         %{name}-ldflags.patch
-Patch1:         %{name}-no-hostname-whoami.patch
+Patch1:         %{name}-ldflags.patch
+Patch2:         %{name}-no-hostname-whoami.patch
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
@@ -93,6 +95,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Tue May 20 2025 Simone Caronni <negativo17@gmail.com> - 3:575.51.02-1
+- Update to 575.51.02.
+
 * Tue May 20 2025 Simone Caronni <negativo17@gmail.com> - 3:570.153.02-1
 - Update to 570.153.02.
 
