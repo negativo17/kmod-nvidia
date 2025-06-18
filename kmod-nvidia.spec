@@ -2,9 +2,6 @@
 
 %global debug_package %{nil}
 
-# Generate kernel symbols requirements:
-%global _use_internal_dependency_generator 0
-
 # Build flags are inherited from the kernel
 %undefine _auto_set_build_flags
 
