@@ -5,6 +5,9 @@
 # Generate kernel symbols requirements:
 %global _use_internal_dependency_generator 0
 
+# Build flags are inherited from the kernel
+%undefine _auto_set_build_flags
+
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
@@ -17,8 +20,6 @@ URL:            http://www.nvidia.com/
 ExclusiveArch:  x86_64 aarch64
 
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{version}/open-gpu-kernel-modules-%{version}.tar.gz
-# https://git.almalinux.org/ngompa/nvidia-kmod-el-rpm/
-Patch0:         %{name}-ldflags.patch
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
