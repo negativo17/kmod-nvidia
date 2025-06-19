@@ -46,6 +46,7 @@ export SYSSRC=%{_usrsrc}/kernels/%{kversion}
 export IGNORE_XEN_PRESENCE=1
 export IGNORE_PREEMPT_RT_PRESENCE=1
 export IGNORE_CC_MISMATCH=1
+export EXTRA_CFLAGS+=" -Wno-incompatible-pointer-types"
 
 %make_build modules
 
