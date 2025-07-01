@@ -8,7 +8,7 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        575.64
+Version:        575.64.03
 Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
@@ -91,6 +91,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Tue Jul 01 2025 Simone Caronni <negativo17@gmail.com> - 3:575.64.03-1
+- Update to 575.64.03.
+
 * Wed Jun 18 2025 Simone Caronni <negativo17@gmail.com> - 3:575.64-1
 - Update to 575.64.
 
