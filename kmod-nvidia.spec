@@ -8,7 +8,7 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        580.105.08
+Version:        590.44.01
 Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
@@ -20,6 +20,10 @@ Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{vers
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
+# The run file contains precompiled C++ code for the open modules:
+#   kernel-open/nvidia/nv-kernel.o_binary
+#   kernel-open/nvidia-modeset/nv-modeset-kernel.o_binary
+# The full open tarball requires also a c++ compiler to build those bits:
 BuildRequires:  gcc-c++
 BuildRequires:  kernel-abi-stablelists
 BuildRequires:  kernel-devel
@@ -91,6 +95,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Fri Dec 05 2025 Simone Caronni <negativo17@gmail.com> - 3:590.44.01-1
+- Update to 590.44.01.
+
 * Fri Nov 07 2025 Simone Caronni <negativo17@gmail.com> - 3:580.105.08-1
 - Update to 580.105.08.
 
