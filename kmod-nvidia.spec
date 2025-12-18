@@ -8,8 +8,8 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        590.44.01
-Release:        2%{?dist}
+Version:        590.48.01
+Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -95,6 +95,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Thu Dec 18 2025 Simone Caronni <negativo17@gmail.com> - 3:590.48.01-1
+- Update to 590.48.01.
+
 * Thu Dec 18 2025 Simone Caronni <negativo17@gmail.com> - 3:590.44.01-2
 - Rebuild for updated symbols.
 
