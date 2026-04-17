@@ -5,11 +5,13 @@
 # Build flags are inherited from the kernel
 %undefine _auto_set_build_flags
 
+%bcond kabi 0
+
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
 Version:        595.58.03
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -25,15 +27,20 @@ BuildRequires:  gcc
 #   kernel-open/nvidia-modeset/nv-modeset-kernel.o_binary
 # The full open tarball requires also a c++ compiler to build those bits:
 BuildRequires:  gcc-c++
-BuildRequires:  kernel-abi-stablelists
 BuildRequires:  kernel-devel
 BuildRequires:  kernel-rpm-macros
 BuildRequires:  kmod
 BuildRequires:  redhat-rpm-config
 
-Provides:   kabi-modules = %{kversion}
-Provides:   %{kmod_name}-kmod = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:   module-init-tools
+Provides:       %{kmod_name}-kmod = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       module-init-tools
+
+%if %{with kabi}
+BuildRequires:  kernel-abi-stablelists
+Provides:       kabi-modules = %{kversion}
+%else
+Requires:       kernel-uname-r = %{kversion}
+%endif
 
 %description
 This package provides the proprietary NVIDIA kernel modules. It is built to
@@ -95,6 +102,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Fri Apr 17 2026 Simone Caronni <negativo17@gmail.com> - 3:595.58.03-2
+- Allow building for kABI and non-kABI (the default) scenarios.
+
 * Tue Mar 24 2026 Simone Caronni <negativo17@gmail.com> - 3:595.58.03-1
 - Update to 595.58.03.
 
