@@ -10,8 +10,8 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        595.58.03
-Release:        2%{?dist}
+Version:        595.71.05
+Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -102,6 +102,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Tue Apr 28 2026 Simone Caronni <negativo17@gmail.com> - 3:595.71.05-1
+- Update to 595.71.05.
+
 * Fri Apr 17 2026 Simone Caronni <negativo17@gmail.com> - 3:595.58.03-2
 - Allow building for kABI and non-kABI (the default) scenarios.
 
