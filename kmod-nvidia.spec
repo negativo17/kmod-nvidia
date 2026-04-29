@@ -5,7 +5,7 @@
 # Build flags are inherited from the kernel
 %undefine _auto_set_build_flags
 
-%bcond kabi 0
+%bcond kabi 1
 
 %{!?kversion: %global kversion %(uname -r)}
 
@@ -50,8 +50,6 @@ of the Linux kernel and not on any one specific build.
 %prep
 %autosetup -p1 -n open-gpu-kernel-modules-%{version}
 
-echo "override %{kmod_name} * weak-updates/%{kmod_name}" > kmod-%{kmod_name}.conf
-
 %build
 export SYSSRC=%{_usrsrc}/kernels/%{kversion}
 export IGNORE_XEN_PRESENCE=1
@@ -67,13 +65,21 @@ export INSTALL_MOD_DIR=extra/%{kmod_name}
 
 make -C %{_usrsrc}/kernels/%{kversion} -j$(nproc) modules_install M=$PWD/kernel-open
 
+%if %{with kabi}
 install -d %{buildroot}%{_sysconfdir}/depmod.d/
-install kmod-%{kmod_name}.conf %{buildroot}%{_sysconfdir}/depmod.d/
+echo "override %{kmod_name} * weak-updates/%{kmod_name}" > %{buildroot}%{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
+%endif
+
 # Remove the unrequired files.
 rm -f %{buildroot}%{_prefix}/lib/modules/%{kversion}/modules.*
 
 find %{buildroot} -type f -name '*.ko' | xargs %{__strip} --strip-debug
 find %{buildroot} -type f -name '*.ko' | xargs xz
+
+%if %{with kabi}
+
+install -d %{buildroot}%{_sysconfdir}/depmod.d/
+echo "override %{kmod_name} * weak-updates/%{kmod_name}" > %{buildroot}%{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %post
 if [ -e "/boot/System.map-%{kversion}" ]; then
@@ -97,9 +103,25 @@ if [ -x "%{_sbindir}/weak-modules" ]; then
     printf '%s\n' "${modules[@]}" | %{_sbindir}/weak-modules --remove-modules
 fi
 
+%else
+
+%post
+if [ -e "/boot/System.map-%{kversion}" ]; then
+    %{_sbindir}/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
+fi
+
+%postun
+if [ -e "/boot/System.map-%{kversion}" ]; then
+    %{_sbindir}/depmod -aeF "/boot/System.map-%{kversion}" "%{kversion}" > /dev/null || :
+fi
+
+%endif
+
 %files
 %{_prefix}/lib/modules/%{kversion}/extra/*
+%if %{with kabi}
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
+%endif
 
 %changelog
 * Tue Apr 28 2026 Simone Caronni <negativo17@gmail.com> - 3:595.71.05-1
