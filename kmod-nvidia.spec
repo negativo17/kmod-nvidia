@@ -8,8 +8,8 @@
 %{!?kversion: %global kversion %(uname -r)}
 
 Name:           kmod-%{kmod_name}
-Version:        615.71.09
-Release:        2%{?dist}
+Version:        615.78.08
+Release:        1%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -97,6 +97,9 @@ fi
 %config %{_sysconfdir}/depmod.d/kmod-%{kmod_name}.conf
 
 %changelog
+* Wed Oct 07 2026 Simone Caronni <negativo17@gmail.com> - 3:615.78.08-1
+- Update to 615.78.08.
+
 * Tue Sep 22 2026 Simone Caronni <negativo17@gmail.com> - 3:615.71.09-2
 - Add patches from Anatase (https://anatase.org/).
 
