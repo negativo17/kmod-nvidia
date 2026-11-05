@@ -5,7 +5,18 @@
 # Build flags are inherited from the kernel
 %undefine _auto_set_build_flags
 
+# %%bcond is not available in el8's RPM 4.14
+%if 0%{?rhel} == 8
+%bcond_without kabi
+%endif
+%if 0%{?rhel} >= 9
 %bcond kabi 1
+%endif
+
+# kABI kernel modules only on RHEL
+%if 0%{?fedora}
+%bcond kabi 0
+%endif
 
 %{!?kversion: %global kversion %(uname -r)}
 
