@@ -22,7 +22,7 @@
 
 Name:           kmod-%{kmod_name}
 Version:        620.70.06
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        NVIDIA display driver kernel module
 Epoch:          3
 License:        NVIDIA License
@@ -34,6 +34,7 @@ Patch0:         https://github.com/scaronni/open-gpu-kernel-modules/commit/f84dd
 Patch1:         https://github.com/scaronni/open-gpu-kernel-modules/commit/62a33c475b89031c8f893bd82c2e9d4c82a9a025.patch
 Patch2:         https://github.com/scaronni/open-gpu-kernel-modules/commit/e8197c87647b90b4c9eb2a82aae85d009e108442.patch
 Patch3:         https://github.com/scaronni/open-gpu-kernel-modules/commit/77957d11eaa9bf4ba1c3c9a7137a9099e652fcb1.patch
+Patch4:         https://github.com/scaronni/open-gpu-kernel-modules/commit/fdec4df00281d26337ff65ddb393365f715b6cb5.patch
 
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
@@ -139,6 +140,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 12 2026 Simone Caronni <negativo17@gmail.com> - 3:620.70.06-2
+- Re-enable D3 Power Management for 7.3.
+
 * Wed Nov 04 2026 Simone Caronni <negativo17@gmail.com> - 3:620.70.06-1
 - Update to 620.70.06.
 - Add Big Screen Beyond patches.
